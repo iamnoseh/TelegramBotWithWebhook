@@ -40,7 +40,7 @@ var app = builder.Build();
 
 // Танзими Webhook бо URL-и localtunnel
 var botClient = app.Services.GetRequiredService<TelegramBotClient>();
-var webhookUrl = "https://evil-toys-teach.loca.lt/api/telegram/webhook"; // URL-и localtunnel-и худро ворид кунед
+var webhookUrl = "https://all-groups-share.loca.lt/api/telegram/webhook"; // URL-и localtunnel-и худро ворид кунед
 await botClient.SetWebhookAsync(webhookUrl);
 
 app.MapControllers();
