@@ -43,4 +43,5 @@ var webhookUrl = "https://thin-guests-search.loca.lt/api/telegram/webhook";
 await botClient.SetWebhookAsync(webhookUrl);
 
 app.MapControllers();
+app.Urls.Add("http://31.130.144.99:5210");
 app.Run();
