@@ -39,7 +39,7 @@ var app = builder.Build();
 
 // Танзими Webhook
 var botClient = app.Services.GetRequiredService<TelegramBotClient>();
-var webhookUrl = "https:///api/telegram/webhook";
+var webhookUrl = "https://thin-guests-search.loca.lt/api/telegram/webhook";
 await botClient.SetWebhookAsync(webhookUrl);
 
 app.MapControllers();
