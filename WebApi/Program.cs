@@ -9,14 +9,15 @@ using Infrastructure.Data.TelegramBot.Infrastructure.Data;
 using Infrastructure.Services.TelegramBot.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
+;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// Танзимоти DbContext
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+// Танзимоти хидматҳо
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IOptionRepository, OptionRepository>();
@@ -37,11 +38,10 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Танзими Webhook
+// Танзими Webhook бо URL-и localtunnel
 var botClient = app.Services.GetRequiredService<TelegramBotClient>();
-var webhookUrl = "https://thin-guests-search.loca.lt/api/telegram/webhook";
+var webhookUrl = "https://evil-toys-teach.loca.lt/api/telegram/webhook"; // URL-и localtunnel-и худро ворид кунед
 await botClient.SetWebhookAsync(webhookUrl);
 
 app.MapControllers();
-app.Urls.Add("http://31.130.144.99:5210");
 app.Run();
