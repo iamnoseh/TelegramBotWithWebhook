@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using Core.Interfaces;
 using Core.Interfaces.TelegramBot.Core.Interfaces;
 using Core.UseCases.TelegramBot.Core.UseCases;
@@ -9,15 +11,36 @@ using Infrastructure.Data.TelegramBot.Infrastructure.Data;
 using Infrastructure.Services.TelegramBot.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
-;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Танзимоти DbContext
+// Гирифтани IP-и сервер
+var host = Dns.GetHostName();
+var ip = Dns.GetHostAddresses(host).FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
+
+if (ip == null)
+{
+    Console.WriteLine("IP-и сервер ёфт нашуд!");
+    return;
+}
+
+Console.WriteLine($"Сервер дар IP: {ip} кор мекунад");
+
+// Танзимоти Kestrel барои HTTPS ва IP
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Listen(IPAddress.Any, 5000); // HTTP
+    serverOptions.Listen(IPAddress.Any, 5001, listenOptions =>
+    {
+        listenOptions.UseHttps(); // HTTPS
+    });
+});
+builder.WebHost.UseKestrel()
+    .UseUrls("http://0.0.0.0:5000");
+
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Танзимоти хидматҳо
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IOptionRepository, OptionRepository>();
@@ -38,9 +61,11 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Танзими Webhook бо URL-и localtunnel
+// Танзими Webhook бо URL-и сервер
 var botClient = app.Services.GetRequiredService<TelegramBotClient>();
-var webhookUrl = builder.Configuration["BotConfiguration:WebhookUrl"];
+var webhookUrl = $"https://{ip}:5001/api/telegram/webhook";
 await botClient.SetWebhookAsync(webhookUrl);
+
+
 app.MapControllers();
 app.Run();
